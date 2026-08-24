@@ -1,0 +1,23 @@
+{
+  "name": "@upkick/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./app": "./src/app.ts",
+    "./features": "./src/features.ts",
+    "./plans": "./src/plans.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@upkick/typescript-config": "workspace:*",
+    "typescript": "^5"
+  },
+  "license": "MIT"
+}

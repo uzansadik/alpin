@@ -1,0 +1,18 @@
+{
+  "name": "@upkick/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts",
+    "./next": "./src/next.ts"
+  },
+  "dependencies": {
+    "@upkick/config": "workspace:*",
+    "@upkick/email": "workspace:*",
+    "@upkick/db": "workspace:*",
+    "@upkick/env": "workspace:*",
+    "better-auth": "^1.6.24"
+  }
+}

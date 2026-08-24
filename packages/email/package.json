@@ -1,0 +1,14 @@
+{
+  "name": "@upkick/email",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@upkick/config": "workspace:*",
+    "@upkick/env": "workspace:*",
+    "resend": "^6.0.0"
+  }
+}

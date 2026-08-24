@@ -17,5 +17,11 @@ This will place the ui components in the `packages/ui/src/components` directory.
 To use the components in your app, import them from the `ui` package.
 
 ```tsx
-import { Button } from "@workspace/ui/components/button";
+import { Button } from "@upkick/ui/components/button";
 ```
+
+db:reset
+→ local DB bozulduysa istediğin zaman
+
+db:reset:hard
+→ SADECE henüz migration'lar production/shared DB'ye çıkmadıysa
