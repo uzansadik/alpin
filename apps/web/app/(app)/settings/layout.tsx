@@ -23,6 +23,9 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         <Button asChild variant="ghost">
           <Link href="/settings/members">Members</Link>
         </Button>
+        <Button asChild variant="ghost">
+          <Link href="/settings/billing">Billing</Link>
+        </Button>
       </div>
 
       {children}

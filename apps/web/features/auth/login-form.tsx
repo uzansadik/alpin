@@ -43,6 +43,15 @@ export function LoginForm({ next }: LoginFormProps) {
       callbackURL: next,
     });
 
+    const organizations = await authClient.organization.list();
+    if (organizations.data?.length) {
+  await authClient.organization.setActive({
+    organizationId: organizations.data[0]?.id,
+  });
+}
+
+
+
     if (error) {
       if (error.status === 403) {
         const params = new URLSearchParams({
