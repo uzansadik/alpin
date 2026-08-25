@@ -21,9 +21,10 @@ const serverEnvSchema = z.object({
   //Polar related env variables
   POLAR_ACCESS_TOKEN: z.string().min(1).optional(),
   POLAR_SERVER: z.enum(["sandbox", "production"]).default("sandbox"),
-  POLAR_WEBHOOK_SECRET: z.string().optional(),
+  POLAR_WEBHOOK_SECRET: z.string().min(1, "POLAR_WEBHOOK_SECRET is required"),
   POLAR_AI_CREDITS_METER_ID: z.string().min(1),
   POLAR_PRO_MONTHLY_PRODUCT_ID: z.string().min(1),
+  POLAR_PRO_YEARLY_PRODUCT_ID: z.string().min(1).optional(),
   POLAR_AI_CREDITS_500_PRODUCT_ID: z.string().min(1),
   NEXT_PUBLIC_APP_URL: z.url().min(1, "NEXT_PUBLIC_APP_URL is required"),
 });
@@ -47,6 +48,7 @@ export const env = serverEnvSchema.parse({
   POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
   POLAR_AI_CREDITS_METER_ID: process.env.POLAR_AI_CREDITS_METER_ID,
   POLAR_PRO_MONTHLY_PRODUCT_ID: process.env.POLAR_PRO_MONTHLY_PRODUCT_ID,
+  POLAR_PRO_YEARLY_PRODUCT_ID: process.env.POLAR_PRO_YEARLY_PRODUCT_ID,
   POLAR_AI_CREDITS_500_PRODUCT_ID: process.env.POLAR_AI_CREDITS_500_PRODUCT_ID,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
 });

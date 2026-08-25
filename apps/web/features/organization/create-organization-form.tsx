@@ -53,7 +53,14 @@ export function CreateOrganizationForm() {
 
       return;
     }
+    const { data: organizations } = await authClient.organization.list();
+    const nextOrganization = organizations?.[0];
 
+    if (nextOrganization) {
+      await authClient.organization.setActive({
+        organizationId: nextOrganization.id,
+      });
+    }
     router.replace("/dashboard");
     router.refresh();
   }

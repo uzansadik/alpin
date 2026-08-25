@@ -1,3 +1,4 @@
+import { DeleteOrganization } from "@/features/organization/delete-organization";
 import { OrganizationSettingsForm } from "@/features/organization/organization-settings-form";
 import { requireOrganizationOwner } from "@/features/organization/server";
 
@@ -22,6 +23,7 @@ export default async function SettingsPage() {
           logo: organization.logo ?? undefined,
         }}
       />
+      <DeleteOrganization organizationId={organization.id} organizationName={organization.name} />
     </div>
   );
 }
