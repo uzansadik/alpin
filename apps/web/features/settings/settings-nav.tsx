@@ -21,6 +21,14 @@ const items = [
     title: "Profile",
     href: "/settings/profile",
   },
+  {
+    title: "Activity",
+    href: "/settings/activity",
+  },
+  {
+    title: "API Keys",
+    href: "/settings/api-keys",
+  },
 ];
 
 export function SettingsNav({ isOwner }: SettingsNavProps) {

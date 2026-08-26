@@ -1,3 +1,4 @@
+import { apiKey } from "@better-auth/api-key";
 import { checkout, polar, portal, usage, webhooks } from "@polar-sh/better-auth";
 import { appConfig } from "@upkick/config";
 import { db } from "@upkick/db";
@@ -87,6 +88,14 @@ export const auth = betterAuth({
         });
       },
     }),
+    apiKey([
+      {
+        configId: "org-keys",
+        references: "organization",
+        defaultPrefix: "up_",
+      },
+    ]),
+
     polar({
       client: polarClient,
 

@@ -9,6 +9,7 @@
     "./next": "./src/next.ts"
   },
   "dependencies": {
+    "@better-auth/api-key": "^1.7.1",
     "@polar-sh/better-auth": "^1.8.4",
     "@polar-sh/sdk": "^0.49.0",
     "@upkick/config": "workspace:*",

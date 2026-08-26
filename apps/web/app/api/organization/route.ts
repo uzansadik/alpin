@@ -6,7 +6,7 @@ import {
   verifyUploadedObject,
 } from "@upkick/storage/server";
 import { z } from "zod";
-
+import { audit } from "@/features/audit/server";
 import { getSession } from "@/features/auth/session";
 import { getActiveOrganizationMember, requireOrganization } from "@/features/organization/server";
 
@@ -130,6 +130,22 @@ export async function PATCH(request: Request) {
         console.error("Failed to delete previous organization logo:", error);
       }
     }
+    await audit({
+      organizationId: organization.id,
+
+      action: "organization.updated",
+
+      target: {
+        type: "organization",
+        id: organization.id,
+      },
+
+      metadata: {
+        name,
+        slug,
+        logoChanged: Boolean(logoKey),
+      },
+    });
 
     return Response.json({
       organization: updatedOrganization,
