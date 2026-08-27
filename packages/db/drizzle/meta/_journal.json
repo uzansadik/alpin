@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1787678014049,
-      "tag": "0000_fixed_vision",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1787689675021,
-      "tag": "0001_light_angel",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1787690964647,
-      "tag": "0002_romantic_ghost_rider",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1787691290424,
-      "tag": "0003_solid_lilandra",
+      "when": 1787835687043,
+      "tag": "0000_illegal_korg",
       "breakpoints": true
     }
   ]
