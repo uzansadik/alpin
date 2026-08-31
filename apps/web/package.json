@@ -23,6 +23,7 @@
     "@upkick/env": "workspace:*",
     "@upkick/storage": "workspace:*",
     "@upkick/ui": "workspace:*",
+    "@upkick/queue": "workspace:*",
     "cmdk": "^1.1.1",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",

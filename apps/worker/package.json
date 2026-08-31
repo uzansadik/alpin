@@ -1,0 +1,21 @@
+{
+  "name": "@upkick/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@upkick/queue": "workspace:*",
+    "@upkick/redis": "workspace:*",
+    "bullmq": "^6.3.2"
+  },
+  "devDependencies": {
+    "@upkick/typescript-config": "workspace:*",
+    "tsx": "^4.20.0",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@upkick/redis",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./producer": "./src/producer.ts",
+    "./worker": "./src/worker.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@upkick/env": "workspace:*",
+    "ioredis": "^5.11.1"
+  },
+  "devDependencies": {
+    "@upkick/typescript-config": "workspace:*",
+    "typescript": "^5"
+  }
+}

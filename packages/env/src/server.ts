@@ -27,6 +27,7 @@ const serverEnvSchema = z.object({
   POLAR_PRO_YEARLY_PRODUCT_ID: z.string().min(1).optional(),
   POLAR_AI_CREDITS_500_PRODUCT_ID: z.string().min(1),
   NEXT_PUBLIC_APP_URL: z.url().min(1, "NEXT_PUBLIC_APP_URL is required"),
+  REDIS_URL: z.string().min(1, "REDIS_URL is required"),
 });
 
 export const env = serverEnvSchema.parse({
@@ -51,6 +52,7 @@ export const env = serverEnvSchema.parse({
   POLAR_PRO_YEARLY_PRODUCT_ID: process.env.POLAR_PRO_YEARLY_PRODUCT_ID,
   POLAR_AI_CREDITS_500_PRODUCT_ID: process.env.POLAR_AI_CREDITS_500_PRODUCT_ID,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  REDIS_URL: process.env.REDIS_URL,
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
