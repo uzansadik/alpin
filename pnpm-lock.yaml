@@ -132,6 +132,12 @@ importers:
 
   apps/worker:
     dependencies:
+      '@upkick/email':
+        specifier: workspace:*
+        version: link:../../packages/email
+      '@upkick/env':
+        specifier: workspace:*
+        version: link:../../packages/env
       '@upkick/queue':
         specifier: workspace:*
         version: link:../../packages/queue
@@ -236,6 +242,9 @@ importers:
 
   packages/queue:
     dependencies:
+      '@upkick/env':
+        specifier: workspace:*
+        version: link:../env
       '@upkick/redis':
         specifier: workspace:*
         version: link:../redis

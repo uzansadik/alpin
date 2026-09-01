@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@upkick/email": "workspace:*",
+    "@upkick/env": "workspace:*",
     "@upkick/queue": "workspace:*",
     "@upkick/redis": "workspace:*",
     "bullmq": "^6.3.2"

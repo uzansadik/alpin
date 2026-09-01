@@ -1,5 +1,4 @@
-import { env } from "@upkick/env/server";
-
+import { emailEnv } from "@upkick/env/email";
 import { resend } from "./client";
 
 type SendEmailInput = {
@@ -10,7 +9,7 @@ type SendEmailInput = {
 
 export async function sendEmail({ to, subject, html }: SendEmailInput) {
   const { data, error } = await resend.emails.send({
-    from: env.RESEND_FROM_EMAIL,
+    from: emailEnv.RESEND_FROM_EMAIL,
     to,
     subject,
     html,

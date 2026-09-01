@@ -1,36 +1,55 @@
+import { queueConfig } from "@upkick/queue";
 import { createRedisWorkerConnection } from "@upkick/redis/worker";
 import { Worker } from "bullmq";
 
 import { processSystemPing } from "../jobs/system-ping";
 
-const connection = createRedisWorkerConnection();
+export function createDefaultWorker() {
+  const connection = createRedisWorkerConnection();
 
-export const defaultWorker = new Worker(
-  "default",
-  async (job) => {
-    switch (job.name) {
-      case "system.ping":
-        return processSystemPing(job);
+  const worker = new Worker(
+    "default",
+    async (job) => {
+      switch (job.name) {
+        case "system.ping":
+          return processSystemPing(job);
 
-      default:
-        throw new Error(`Unknown job "${job.name}" in default queue`);
-    }
-  },
-  {
-    connection,
-    concurrency: 10,
-    skipVersionCheck: true,
-  },
-);
+        default:
+          throw new Error(`Unknown job "${job.name}" in default queue`);
+      }
+    },
+    {
+      connection,
+      prefix: queueConfig.prefix,
+      concurrency: 10,
+      skipVersionCheck: true,
+    },
+  );
 
-defaultWorker.on("completed", (job) => {
-  console.log(`[worker] completed ${job.name} (${job.id})`);
-});
+  worker.on("completed", (job) => {
+    console.log(`[worker:default] completed ${job.name} (${job.id})`);
+  });
 
-defaultWorker.on("failed", (job, error) => {
-  console.error(`[worker] failed ${job?.name} (${job?.id})`, error);
-});
+  worker.on("failed", (job, error) => {
+    console.error(`[worker:default] failed ${job?.name} (${job?.id})`, error);
+  });
 
-defaultWorker.on("error", (error) => {
-  console.error("[worker] error", error);
-});
+  worker.on("error", (error) => {
+    console.error("[worker:default] error", error);
+  });
+
+  return {
+    name: "default" as const,
+    worker,
+
+    async close() {
+      await worker.close();
+
+      try {
+        await connection.quit();
+      } catch {
+        connection.disconnect();
+      }
+    },
+  };
+}

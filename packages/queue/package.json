@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@upkick/env": "workspace:*",
     "@upkick/redis": "workspace:*",
     "bullmq": "^6.3.2"
   },

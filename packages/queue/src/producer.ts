@@ -1,5 +1,6 @@
 import { redisProducer } from "@upkick/redis/producer";
 import { type JobsOptions, Queue } from "bullmq";
+import { queueConfig } from "./config";
 
 import { type JobName, type JobPayloads, jobQueues } from "./jobs";
 import { type QueueName, queueNames } from "./queues";
@@ -27,6 +28,7 @@ const queues = Object.fromEntries(
     name,
     new Queue(name, {
       connection: redisProducer,
+      prefix: queueConfig.prefix,
       defaultJobOptions,
       skipVersionCheck: true,
     }),
