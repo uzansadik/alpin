@@ -3,12 +3,8 @@ import { checkout, polar, portal, usage, webhooks } from "@polar-sh/better-auth"
 import { appConfig } from "@upkick/config";
 import { db } from "@upkick/db";
 import * as schema from "@upkick/db/schema";
-import {
-  sendOrganizationInvitationEmail,
-  sendPasswordResetEmail,
-  sendVerificationEmail,
-} from "@upkick/email";
 import { env } from "@upkick/env/server";
+import { addJob } from "@upkick/queue";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, organization } from "better-auth/plugins";
@@ -40,9 +36,9 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
 
     sendVerificationEmail: async ({ user, url }) => {
-      void sendVerificationEmail({
-        email: user.email,
-        url,
+      await addJob("email.verification", {
+        to: user.email,
+        verificationUrl: url,
       }).catch(console.error);
     },
   },
@@ -62,10 +58,14 @@ export const auth = betterAuth({
     }),
 
     sendResetPassword: async ({ user, url }) => {
-      void sendPasswordResetEmail({
-        email: user.email,
-        url,
-      }).catch(console.error);
+      await addJob(
+        "email.password-reset",
+        {
+          to: user.email,
+          resetUrl: url,
+        },
+        { deduplication: { id: `password-reset-${user.id}`, ttl: 60 * 60 * 24 } },
+      ).catch(console.error);
     },
   },
 
@@ -80,11 +80,11 @@ export const auth = betterAuth({
 
         url.searchParams.set("id", data.id);
 
-        await sendOrganizationInvitationEmail({
-          email: data.email,
-          inviterName: data.inviter.user.name,
+        await addJob("email.organization-invitation", {
+          to: data.email,
+          invitationUrl: url.toString(),
           organizationName: data.organization.name,
-          url: url.toString(),
+          inviterName: data.inviter.user.name,
         });
       },
     }),

@@ -1,6 +1,7 @@
 import type { QueueName } from "@upkick/queue";
 
 import { createDefaultWorker } from "./default-worker";
+import { createEmailWorker } from "./email-worker";
 
 export type WorkerRuntime = {
   name: QueueName;
@@ -11,6 +12,7 @@ type WorkerFactory = () => WorkerRuntime;
 
 const workerFactories: Partial<Record<QueueName, WorkerFactory>> = {
   default: createDefaultWorker,
+  email: createEmailWorker,
 };
 
 export function createWorkers(queueNames: readonly QueueName[]) {

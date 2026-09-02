@@ -1,6 +1,5 @@
 export { sendEmail } from "./send";
-export {
-  sendOrganizationInvitationEmail,
-  sendPasswordResetEmail,
-  sendVerificationEmail,
-} from "./templates";
+export { organizationInvitationEmail } from "./templates/organization-invitation";
+
+export { passwordResetEmail } from "./templates/password-reset";
+export { verificationEmail } from "./templates/verification";

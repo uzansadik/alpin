@@ -15,6 +15,7 @@
     "@upkick/config": "workspace:*",
     "@upkick/db": "workspace:*",
     "@upkick/email": "workspace:*",
+    "@upkick/queue": "workspace:*",
     "@upkick/env": "workspace:*",
     "better-auth": "^1.6.24"
   }

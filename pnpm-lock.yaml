@@ -187,6 +187,9 @@ importers:
       '@upkick/env':
         specifier: workspace:*
         version: link:../env
+      '@upkick/queue':
+        specifier: workspace:*
+        version: link:../queue
       better-auth:
         specifier: ^1.6.24
         version: 1.7.1(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@types/pg@8.23.1)(kysely@0.29.5)(pg@8.23.0))(next@16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pg@8.23.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
