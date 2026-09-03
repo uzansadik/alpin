@@ -1,3 +1,4 @@
+import { LanguageSelect } from "@/components/language-switcher";
 import { requireSession } from "@/features/auth/session";
 import { ChangePasswordForm } from "@/features/profile/change-password-form";
 import { ProfileForm } from "@/features/profile/profile-form";
@@ -17,6 +18,7 @@ export default async function ProfilePage() {
       />
       <ChangePasswordForm />
       <SessionsSection />
+      <LanguageSelect />
     </div>
   );
 }

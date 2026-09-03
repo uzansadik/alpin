@@ -1,0 +1,25 @@
+{
+  "name": "@upkick/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./actions": "./src/actions.ts"
+  },
+  "peerDependencies": {
+    "next": "^16.2.6",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@upkick/typescript-config": "workspace:*",
+    "@types/react": "^19.0.0",
+    "next": "^16.2.6",
+    "react": "^19.0.0",
+    "typescript": "^5"
+  }
+}

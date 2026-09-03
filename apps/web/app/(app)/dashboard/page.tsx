@@ -1,3 +1,4 @@
+import { getTranslations } from "@upkick/i18n/server";
 import { Badge } from "@upkick/ui/components/badge";
 import {
   Card,
@@ -12,6 +13,8 @@ import { requireSession } from "@/features/auth/session";
 import { getOrganizationDetails, requireOrganization } from "@/features/organization/server";
 
 export default async function DashboardPage() {
+  const t = await getTranslations();
+
   const session = await requireSession();
   const organization = await requireOrganization();
 
@@ -22,7 +25,12 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Welcome back, {session.user.name}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {" "}
+          {t("dashboard.welcome", {
+            name: session.user.name ?? session.user.email,
+          })}
+        </h1>
 
         <p className="mt-1 text-muted-foreground">
           Here&apos;s an overview of {organization.name}.
@@ -32,7 +40,7 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Members</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("dashboard.members")}</CardTitle>
 
             <Users className="size-4 text-muted-foreground" />
           </CardHeader>

@@ -50,6 +50,9 @@ importers:
       '@upkick/env':
         specifier: workspace:*
         version: link:../../packages/env
+      '@upkick/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@upkick/queue':
         specifier: workspace:*
         version: link:../../packages/queue
@@ -242,6 +245,24 @@ importers:
       zod:
         specifier: ^4.0.0
         version: 4.4.3
+
+  packages/i18n:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.15
+      '@upkick/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      next:
+        specifier: ^16.2.6
+        version: 16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/queue:
     dependencies:
