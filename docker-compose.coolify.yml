@@ -1,0 +1,100 @@
+# Alpin production stack, deploy via Coolify Git-based Docker Compose Application.
+# GH Actions builds qms/worker/migrate and pushes them to GHCR.
+# This Compose file only PULLS the application images.
+
+x-runtime-env: &runtime-env
+  NODE_ENV: production
+  APP_ENV: production
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+  REDIS_URL: redis://redis:6379
+  QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
+  NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}
+  BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+  RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY is required}
+  RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:?RESEND_FROM_EMAIL is required}
+  STORAGE_BUCKET: ${STORAGE_BUCKET:?STORAGE_BUCKET is required}
+  STORAGE_REGION: ${STORAGE_REGION:-auto}
+  STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:?STORAGE_ACCESS_KEY_ID is required}
+  STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:?STORAGE_SECRET_ACCESS_KEY is required}
+  STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+  STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL:-}
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: alpin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d alpin"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    image: ghcr.io/uzansadik/alpin/migrate:${APP_TAG:-latest}
+    pull_policy: always
+    restart: "no"
+    exclude_from_hc: true # Coolify-specific: completed job is not unhealthy.
+    environment: *runtime-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  qms:
+    image: ghcr.io/uzansadik/alpin/qms:${APP_TAG:-latest}
+    pull_policy: always
+    restart: unless-stopped
+    environment: *runtime-env
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    image: ghcr.io/uzansadik/alpin/worker:${APP_TAG:-latest}
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      <<: *runtime-env
+      WORKER_QUEUES: ${WORKER_QUEUES:-default,email}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
+  redis_data:
