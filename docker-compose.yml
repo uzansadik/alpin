@@ -5,9 +5,9 @@ name: alpin
 x-build-args: &build-args
   DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
   REDIS_URL: redis://redis:6379
-  QUEUE_PREFIX: alpin
-  NEXT_PUBLIC_APP_URL: http://localhost:3000
-  BETTER_AUTH_URL: http://localhost:3000
+  QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
+  NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+  BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
   BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
   RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY is required}
   RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:?RESEND_FROM_EMAIL is required}
@@ -85,7 +85,9 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
       REDIS_URL: redis://redis:6379
-      QUEUE_PREFIX: alpin
+      QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
 
     depends_on:
       postgres:
@@ -105,12 +107,12 @@ services:
 
     environment:
       NODE_ENV: production
-      APP_ENV: local
+      APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
       REDIS_URL: redis://redis:6379
-      QUEUE_PREFIX: alpin
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      BETTER_AUTH_URL: http://localhost:3000
+      QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
 
     ports:
       - "${APP_PORT:-3000}:3000"
@@ -135,12 +137,13 @@ services:
 
     environment:
       NODE_ENV: production
+      APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
       REDIS_URL: redis://redis:6379
-      QUEUE_PREFIX: alpin
+      QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
       WORKER_QUEUES: default,email
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
 
     depends_on:
       postgres:

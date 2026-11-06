@@ -271,15 +271,27 @@ Typecheck and format are blocking. Lint is currently informational
 (`continue-on-error`) because the vendored shadcn components and a few legacy
 files carry known findings.
 
-## Repository variables and secrets
+## Where each environment variable lives
+
+There are three separate places, and mixing them up is the usual source of
+"works locally, fails in CI" problems.
+
+| Place                                    | What goes there                                                | When it is read |
+| ---------------------------------------- | -------------------------------------------------------------- | --------------- |
+| `.env` in the repo root                  | Every real value for local development and Docker               | Runtime         |
+| `.env` on the deployment host            | Every real value for production                                 | Runtime         |
+| GitHub Actions → Variables / Secrets     | Only the values that must exist while the image is being built  | Build time      |
+
+### Build time (GitHub)
 
 `next build` evaluates route handlers, and `@alpin/env` validates the
 environment when those modules are imported. The workflow therefore passes
-build-only values for every variable that is not defined, so a missing secret
-never breaks the build.
+build-only placeholders for every variable that is not defined, so a missing
+secret never breaks the build.
 
 `NEXT_PUBLIC_APP_URL` is the exception: it is inlined into the client bundle at
-build time, so it has to be a real value.
+build time, so it has to be a real value. Without it the client keeps pointing
+at `http://localhost:3000`.
 
 Settings → Secrets and variables → Actions → Variables:
 
@@ -287,7 +299,8 @@ Settings → Secrets and variables → Actions → Variables:
 NEXT_PUBLIC_APP_URL=https://app.example.com
 ```
 
-The remaining values can be added as repository secrets if the build needs them:
+Everything else is optional on GitHub. If you do define them, put them in
+**Secrets** (they are masked in logs):
 
 ```text
 BETTER_AUTH_SECRET
@@ -304,6 +317,35 @@ STORAGE_PUBLIC_URL
 
 Secrets are never baked into the image. They are passed to the containers at
 runtime through `env_file`.
+
+### Runtime (deployment host)
+
+The real values live in a `.env` file next to `docker-compose.yml` on the
+deployment host. Copy `.env.example` there and fill it in:
+
+```text
+APP_ENV=production
+NEXT_PUBLIC_APP_URL=https://app.example.com
+BETTER_AUTH_SECRET=<openssl rand -base64 32>
+BETTER_AUTH_URL=https://app.example.com
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=...
+STORAGE_BUCKET=...
+STORAGE_REGION=auto
+STORAGE_ACCESS_KEY_ID=...
+STORAGE_SECRET_ACCESS_KEY=...
+STORAGE_ENDPOINT=
+STORAGE_PUBLIC_URL=
+```
+
+`docker-compose.yml` overrides `DATABASE_URL`, `REDIS_URL` and `QUEUE_PREFIX`
+with the in-network service names, so those three are not read from the host
+`.env`. `NEXT_PUBLIC_APP_URL` and `BETTER_AUTH_URL` fall back to
+`http://localhost:3000` but are read from the host `.env` when it defines them.
+
+Note that `NEXT_PUBLIC_APP_URL` has to be correct in **both** places: the
+GitHub variable decides what is baked into the image, and the host `.env`
+decides what the running container reports.
 
 ## Package visibility
 

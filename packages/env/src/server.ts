@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+// `.env` dosyasında değişken tanımlı ama boş bırakılmış olabilir
+// (`STORAGE_ENDPOINT=`). `optional()` yalnızca "anahtar hiç yok" durumunu
+// kabul eder; boş string URL doğrulamasını geçmez. Boş string'leri
+// `undefined`'a çeviriyoruz.
+const optionalUrl = z.preprocess((value) => (value === "" ? undefined : value), z.url().optional());
+
 const serverEnvSchema = z.object({
   APP_ENV: z.enum(["local", "production", "test"]).default("local"),
   DATABASE_URL: z
@@ -14,10 +20,10 @@ const serverEnvSchema = z.object({
   RESEND_FROM_EMAIL: z.email().min(1, "RESEND_FROM_EMAIL is required"),
   STORAGE_BUCKET: z.string().min(1),
   STORAGE_REGION: z.string().min(1),
-  STORAGE_ENDPOINT: z.url().optional(),
+  STORAGE_ENDPOINT: optionalUrl,
   STORAGE_ACCESS_KEY_ID: z.string().min(1),
   STORAGE_SECRET_ACCESS_KEY: z.string().min(1),
-  STORAGE_PUBLIC_URL: z.string().url().optional(),
+  STORAGE_PUBLIC_URL: optionalUrl,
   NEXT_PUBLIC_APP_URL: z.url().min(1, "NEXT_PUBLIC_APP_URL is required"),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
 });
