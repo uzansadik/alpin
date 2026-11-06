@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/auth",
+  "name": "@alpin/auth",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,13 +10,11 @@
   },
   "dependencies": {
     "@better-auth/api-key": "^1.7.1",
-    "@polar-sh/better-auth": "^1.8.4",
-    "@polar-sh/sdk": "^0.49.0",
-    "@upkick/config": "workspace:*",
-    "@upkick/db": "workspace:*",
-    "@upkick/email": "workspace:*",
-    "@upkick/queue": "workspace:*",
-    "@upkick/env": "workspace:*",
+    "@alpin/config": "workspace:*",
+    "@alpin/db": "workspace:*",
+    "@alpin/email": "workspace:*",
+    "@alpin/queue": "workspace:*",
+    "@alpin/env": "workspace:*",
     "better-auth": "^1.6.24"
   }
 }

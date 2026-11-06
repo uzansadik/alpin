@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/redis",
+  "name": "@alpin/redis",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,11 +12,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@upkick/env": "workspace:*",
+    "@alpin/env": "workspace:*",
     "ioredis": "^5.11.1"
   },
   "devDependencies": {
-    "@upkick/typescript-config": "workspace:*",
+    "@alpin/typescript-config": "workspace:*",
     "typescript": "^5"
   }
 }

@@ -1,4 +1,4 @@
-import type { QueueName } from "@upkick/queue";
+import type { QueueName } from "@alpin/queue";
 
 import { createDefaultWorker } from "./default-worker";
 import { createEmailWorker } from "./email-worker";

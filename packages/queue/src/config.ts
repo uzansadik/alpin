@@ -1,4 +1,4 @@
-import { queueEnv } from "@upkick/env/queue";
+import { queueEnv } from "@alpin/env/queue";
 
 export const queueConfig = {
   prefix: queueEnv.QUEUE_PREFIX,

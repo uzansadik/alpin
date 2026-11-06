@@ -1,0 +1,32 @@
+# Bağımlılıklar ve build çıktıları
+node_modules
+**/node_modules
+.next
+**/.next
+.turbo
+**/.turbo
+
+# Build context'e sızması gereken dosyalar
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Ortam dosyaları: image'a gömülmez, compose/build args ile verilir
+.env
+.env.*
+!.env.example
+apps/*/.env
+
+# Docker dosyaları
+docker-compose.yml
+docker-compose.*.yml
+
+# Loglar ve geçici dosyalar
+*.log
+npm-debug.log*
+.DS_Store
+coverage
+out
+dist

@@ -1,7 +1,6 @@
+import { queueConfig } from "@alpin/queue";
+import { createRedisWorkerConnection } from "@alpin/redis/worker";
 import { Worker } from "bullmq";
-
-import { queueConfig } from "@upkick/queue";
-import { createRedisWorkerConnection } from "@upkick/redis/worker";
 
 import {
   processOrganizationInvitationEmail,
@@ -26,9 +25,7 @@ export function createEmailWorker() {
           return processOrganizationInvitationEmail(job);
 
         default:
-          throw new Error(
-            `Unknown job "${job.name}" in email queue`,
-          );
+          throw new Error(`Unknown job "${job.name}" in email queue`);
       }
     },
     {
@@ -40,16 +37,11 @@ export function createEmailWorker() {
   );
 
   worker.on("completed", (job) => {
-    console.log(
-      `[worker:email] completed ${job.name} (${job.id})`,
-    );
+    console.log(`[worker:email] completed ${job.name} (${job.id})`);
   });
 
   worker.on("failed", (job, error) => {
-    console.error(
-      `[worker:email] failed ${job?.name} (${job?.id})`,
-      error,
-    );
+    console.error(`[worker:email] failed ${job?.name} (${job?.id})`, error);
   });
 
   worker.on("error", (error) => {

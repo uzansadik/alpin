@@ -18,14 +18,6 @@ const serverEnvSchema = z.object({
   STORAGE_ACCESS_KEY_ID: z.string().min(1),
   STORAGE_SECRET_ACCESS_KEY: z.string().min(1),
   STORAGE_PUBLIC_URL: z.string().url().optional(),
-  //Polar related env variables
-  POLAR_ACCESS_TOKEN: z.string().min(1).optional(),
-  POLAR_SERVER: z.enum(["sandbox", "production"]).default("sandbox"),
-  POLAR_WEBHOOK_SECRET: z.string().min(1, "POLAR_WEBHOOK_SECRET is required"),
-  POLAR_AI_CREDITS_METER_ID: z.string().min(1),
-  POLAR_PRO_MONTHLY_PRODUCT_ID: z.string().min(1),
-  POLAR_PRO_YEARLY_PRODUCT_ID: z.string().min(1).optional(),
-  POLAR_AI_CREDITS_500_PRODUCT_ID: z.string().min(1),
   NEXT_PUBLIC_APP_URL: z.url().min(1, "NEXT_PUBLIC_APP_URL is required"),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
 });
@@ -44,13 +36,6 @@ export const env = serverEnvSchema.parse({
   STORAGE_ACCESS_KEY_ID: process.env.STORAGE_ACCESS_KEY_ID,
   STORAGE_SECRET_ACCESS_KEY: process.env.STORAGE_SECRET_ACCESS_KEY,
   STORAGE_PUBLIC_URL: process.env.STORAGE_PUBLIC_URL,
-  POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN,
-  POLAR_SERVER: process.env.POLAR_SERVER,
-  POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
-  POLAR_AI_CREDITS_METER_ID: process.env.POLAR_AI_CREDITS_METER_ID,
-  POLAR_PRO_MONTHLY_PRODUCT_ID: process.env.POLAR_PRO_MONTHLY_PRODUCT_ID,
-  POLAR_PRO_YEARLY_PRODUCT_ID: process.env.POLAR_PRO_YEARLY_PRODUCT_ID,
-  POLAR_AI_CREDITS_500_PRODUCT_ID: process.env.POLAR_AI_CREDITS_500_PRODUCT_ID,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   REDIS_URL: process.env.REDIS_URL,
 });

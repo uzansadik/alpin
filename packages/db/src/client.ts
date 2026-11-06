@@ -1,4 +1,4 @@
-import { env } from "@upkick/env/server";
+import { env } from "@alpin/env/server";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 

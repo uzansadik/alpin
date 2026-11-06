@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/db",
+  "name": "@alpin/db",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@upkick/env": "workspace:*",
+    "@alpin/env": "workspace:*",
     "drizzle-orm": "^0.45.0",
     "pg": "^8.16.0"
   },

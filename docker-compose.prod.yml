@@ -1,0 +1,24 @@
+# Deployment override'ı.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# CI (main'e merge) sırasında GHCR'a push edilen image'lar kullanılır.
+# Böylece sunucuda Docker image'ı çekmek dışında Node.js veya kaynak kodu
+# gerekmez.
+services:
+  migrate:
+    image: ghcr.io/uzansadik/alpin/migrate:${APP_TAG:-latest}
+    pull_policy: always
+    # Base dosyadaki `build` tanımını kaldır; sunucu image'ı çekip çalıştırır.
+    build: !reset null
+
+  qms:
+    image: ghcr.io/uzansadik/alpin/qms:${APP_TAG:-latest}
+    pull_policy: always
+    build: !reset null
+
+  worker:
+    image: ghcr.io/uzansadik/alpin/worker:${APP_TAG:-latest}
+    pull_policy: always
+    build: !reset null

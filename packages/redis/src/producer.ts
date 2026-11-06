@@ -1,4 +1,4 @@
-import { env } from "@upkick/env/server";
+import { env } from "@alpin/env/server";
 import IORedis from "ioredis";
 
 const globalForRedis = globalThis as unknown as {

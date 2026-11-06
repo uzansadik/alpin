@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/storage",
+  "name": "@alpin/storage",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,6 +9,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.0.0",
     "@aws-sdk/s3-request-presigner": "^3.0.0",
-    "@upkick/env": "workspace:*"
+    "@alpin/env": "workspace:*"
   }
 }

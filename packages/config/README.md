@@ -1,10 +1,10 @@
-# @upkick/config
+# @alpin/config
 
-Shared static configuration for the Upkick monorepo.
+Shared static configuration for the Alpin monorepo.
 
 ## Purpose
 
-`@upkick/config` contains application-level configuration that can be reused across `apps/*` and other `@upkick/*` packages.
+`@alpin/config` contains application-level configuration that can be reused across `apps/*` and other `@alpin/*` packages.
 
 Typical responsibilities:
 
@@ -22,7 +22,7 @@ import {
   appConfig,
   features,
   getPlan,
-} from "@upkick/config";
+} from "@alpin/config";
 ```
 
 ## Structure
@@ -42,8 +42,8 @@ Contains application identity and general metadata.
 
 ```ts
 export const appConfig = {
-  name: "Upkick",
-  slug: "upkick",
+  name: "Alpin",
+  slug: "alpin",
   description: "A modern SaaS application.",
 };
 ```
@@ -94,7 +94,7 @@ means unlimited members.
 
 ## Package Rules
 
-`@upkick/config` should stay lightweight and framework-agnostic.
+`@alpin/config` should stay lightweight and framework-agnostic.
 
 It may contain:
 
@@ -120,12 +120,12 @@ It should **not** contain:
 Those responsibilities belong in dedicated packages such as:
 
 ```text
-@upkick/db
-@upkick/auth
-@upkick/storage
-@upkick/billing
-@upkick/email
-@upkick/env
+@alpin/db
+@alpin/auth
+@alpin/storage
+@alpin/billing
+@alpin/email
+@alpin/env
 ```
 
 ## Public API
@@ -135,7 +135,7 @@ Public configuration should be exported through `src/index.ts`.
 Consumers should prefer:
 
 ```ts
-import { plans } from "@upkick/config";
+import { plans } from "@alpin/config";
 ```
 
 instead of importing internal files directly.
@@ -150,6 +150,6 @@ When modifying this package:
 4. Prefer serializable configuration values.
 5. Export public APIs through `src/index.ts`.
 6. Avoid unnecessary dependencies.
-7. Keep the package reusable across different products built from the Upkick starter.
+7. Keep the package reusable across different products built from the Alpin starter.
 
-The main design principle is simple: **`@upkick/config` describes the application; it should not run the application.**
+The main design principle is simple: **`@alpin/config` describes the application; it should not run the application.**

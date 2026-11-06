@@ -1,4 +1,4 @@
-import { emailEnv } from "@upkick/env/email";
+import { emailEnv } from "@alpin/env/email";
 import { resend } from "./client";
 
 type SendEmailInput = {

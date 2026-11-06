@@ -1,5 +1,5 @@
-import { workerEnv } from "@upkick/env/worker";
-import { type QueueName, queueNames } from "@upkick/queue";
+import { workerEnv } from "@alpin/env/worker";
+import { type QueueName, queueNames } from "@alpin/queue";
 
 const availableQueues = new Set<string>(queueNames);
 

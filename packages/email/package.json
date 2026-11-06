@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/email",
+  "name": "@alpin/email",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,8 +7,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@upkick/config": "workspace:*",
-    "@upkick/env": "workspace:*",
+    "@alpin/config": "workspace:*",
+    "@alpin/env": "workspace:*",
     "resend": "^6.0.0"
   }
 }

@@ -1,5 +1,5 @@
-import { organizationInvitationEmail, sendEmail } from "@upkick/email";
-import type { JobPayloads } from "@upkick/queue";
+import { organizationInvitationEmail, sendEmail } from "@alpin/email";
+import type { JobPayloads } from "@alpin/queue";
 import type { Job } from "bullmq";
 
 type OrganizationInvitationJob = JobPayloads["email.organization-invitation"];

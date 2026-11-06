@@ -1,4 +1,4 @@
-import { redisProducer } from "@upkick/redis/producer";
+import { redisProducer } from "@alpin/redis/producer";
 import { type JobsOptions, Queue } from "bullmq";
 import { queueConfig } from "./config";
 

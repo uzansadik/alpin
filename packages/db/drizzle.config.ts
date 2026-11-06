@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { env } from "@upkick/env/server";
+import { env } from "@alpin/env/server";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({

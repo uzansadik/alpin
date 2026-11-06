@@ -1,30 +1,56 @@
+name: alpin
+
+# Build sırasında `@alpin/env` şeması doğrulanıyor; bu değerler image'a
+# gömülmez, sadece build ortamına verilir.
+x-build-args: &build-args
+  DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
+  REDIS_URL: redis://redis:6379
+  QUEUE_PREFIX: alpin
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+  BETTER_AUTH_URL: http://localhost:3000
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+  RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY is required}
+  RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:?RESEND_FROM_EMAIL is required}
+  STORAGE_BUCKET: ${STORAGE_BUCKET:?STORAGE_BUCKET is required}
+  STORAGE_REGION: ${STORAGE_REGION:?STORAGE_REGION is required}
+  STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:?STORAGE_ACCESS_KEY_ID is required}
+  STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:?STORAGE_SECRET_ACCESS_KEY is required}
+  STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+  STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL:-}
+
 services:
   postgres:
     image: postgres:17
-    container_name: upkick-postgres
+    container_name: alpin-postgres
     restart: unless-stopped
 
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: upkick
+      POSTGRES_DB: alpin
 
     ports:
       - "5432:5432"
 
     volumes:
-      - upkick_postgres_data:/var/lib/postgresql/data
+      - alpin_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d alpin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7.4-alpine
-    container_name: upkick-redis
+    container_name: alpin-redis
     restart: unless-stopped
 
     ports:
       - "6379:6379"
 
     volumes:
-      - upkick_redis_data:/data
+      - alpin_redis_data:/data
 
     command:
       [
@@ -43,6 +69,87 @@ services:
       timeout: 3s
       retries: 5
 
+  # Şema kurulumu. `qms` bu servisin başarıyla bitmesini bekler.
+  #
+  # Bu servis kendi (ince) image'ını kullanıyor; build sırasında env
+  # doğrulaması yapılmadığı için build argümanına ihtiyaç duymuyor.
+  # Komut image'ın içinde tanımlı; burada `command` ile ezilmemeli.
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/migrate.Dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
+      REDIS_URL: redis://redis:6379
+      QUEUE_PREFIX: alpin
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: "no"
+
+  qms:
+    build:
+      context: .
+      dockerfile: docker/qms.Dockerfile
+
+      args: *build-args
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      APP_ENV: local
+      DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
+      REDIS_URL: redis://redis:6379
+      QUEUE_PREFIX: alpin
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
+
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:root@postgres:5432/alpin
+      REDIS_URL: redis://redis:6379
+      QUEUE_PREFIX: alpin
+      WORKER_QUEUES: default,email
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    restart: unless-stopped
+
 volumes:
-  upkick_postgres_data:
-  upkick_redis_data:
+  alpin_postgres_data:
+  alpin_redis_data:

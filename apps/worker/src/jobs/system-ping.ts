@@ -1,4 +1,4 @@
-import type { JobPayloads } from "@upkick/queue";
+import type { JobPayloads } from "@alpin/queue";
 import type { Job } from "bullmq";
 
 type SystemPingData = JobPayloads["system.ping"];

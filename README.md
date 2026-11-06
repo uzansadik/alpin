@@ -1,6 +1,6 @@
-# Upkick
+# Alpin
 
-Upkick is a reusable SaaS starter built for creating new applications without rebuilding authentication, organizations, billing, storage, email, and common account management features.
+Alpin is a reusable SaaS starter built for creating new applications without rebuilding authentication, organizations, storage, email, and common account management features.
 
 ## Stack
 
@@ -11,7 +11,6 @@ Upkick is a reusable SaaS starter built for creating new applications without re
 * Drizzle ORM
 * Better Auth
 * Better Auth Organizations
-* Polar
 * Cloudflare R2 / S3-compatible storage
 * Resend
 * shadcn/ui
@@ -23,29 +22,34 @@ Upkick is a reusable SaaS starter built for creating new applications without re
 
 ```text
 apps/
-  web/
+  qms/
+  worker/
 
 packages/
+  audit/
   auth/
   config/
   db/
   email/
   env/
+  i18n/
+  queue/
+  redis/
   storage/
   typescript-config/
   ui/
 ```
 
-Application-specific features live inside `apps/web/features`.
+Application-specific features live inside `apps/qms/features`.
 
 Infrastructure packages should remain framework-independent where possible.
 
 For example:
 
 ```text
-apps/web
+apps/qms
     ↓
-@upkick/storage
+@alpin/storage
     ↓
 S3-compatible provider
 ```
@@ -53,13 +57,11 @@ S3-compatible provider
 and:
 
 ```text
-apps/web
+apps/qms
     ↓
-@upkick/auth
+@alpin/auth
     ↓
 Better Auth
-    ↓
-Polar
 ```
 
 ---
@@ -78,7 +80,6 @@ Optional external services used by the starter:
 
 * Resend
 * Cloudflare R2
-* Polar
 
 For local development, PostgreSQL should preferably run locally.
 
@@ -110,10 +111,10 @@ to:
 
 The root `.env` file is the canonical environment file.
 
-Upkick synchronizes it to:
+Alpin synchronizes it to:
 
 ```text
-apps/web/.env
+apps/qms/.env
 ```
 
 when development starts.
@@ -129,7 +130,7 @@ Create a local PostgreSQL database.
 Example:
 
 ```text
-Database: upkick
+Database: alpin
 Host: localhost
 Port: 5432
 ```
@@ -137,7 +138,7 @@ Port: 5432
 Then configure:
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/upkick
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/alpin
 ```
 
 Run the repository's Drizzle database initialization/migration command before starting the application.
@@ -166,6 +167,176 @@ http://localhost:3000
 
 ---
 
+# Docker
+
+The stack can be run without a local Node.js installation:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+
+```text
+postgres   → localhost:5432 (database: alpin)
+redis      → localhost:6379
+migrate    → runs Drizzle migrations once, then exits
+qms        → http://localhost:3000
+worker     → queue worker (default,email)
+```
+
+`migrate` runs before `qms` starts, so the schema is always up to date.
+
+Useful commands:
+
+```bash
+docker compose logs -f qms      # Uygulama logları
+docker compose logs -f worker   # Worker logları
+docker compose ps               # Servis durumu
+docker compose down             # Servisleri durdur
+docker compose down -v          # Servisleri durdur ve verileri sil
+docker compose run --rm migrate # Migration'ları yeniden çalıştır
+```
+
+The images are built from:
+
+```text
+docker/qms.Dockerfile      → Next.js standalone sunucusu
+docker/worker.Dockerfile   → BullMQ worker
+docker/migrate.Dockerfile  → Drizzle migration çalıştırıcı
+```
+
+`.env` is not copied into the image. The values are passed at build time as build
+arguments and at runtime through `env_file`. The database and Redis URLs are
+overridden inside `docker-compose.yml` so that the containers use the `postgres`
+and `redis` services instead of the host values.
+
+The application port can be changed with `APP_PORT`:
+
+```bash
+APP_PORT=3001 docker compose up -d
+```
+
+---
+
+# CI/CD
+
+Every push to `main` (and every merge into `main`) builds the production images
+and publishes them to GitHub Container Registry.
+
+Workflow:
+
+```text
+.github/workflows/docker-images.yml
+```
+
+| Event                       | Verify | Build | Push to GHCR |
+| --------------------------- | ------ | ----- | ------------ |
+| Push to `main`              | yes    | yes   | yes          |
+| Pull request to `main`      | yes    | yes   | no           |
+| Manual (`workflow_dispatch`) | yes    | yes   | yes (on `main`) |
+
+Images:
+
+```text
+ghcr.io/uzansadik/alpin/qms
+ghcr.io/uzansadik/alpin/worker
+ghcr.io/uzansadik/alpin/migrate
+```
+
+Tags produced for every build:
+
+```text
+latest          → only for main
+main            → branch name
+<short-sha>     → commit SHA
+```
+
+The workflow needs the `packages: write` permission. It is declared inside the
+workflow file, and `GITHUB_TOKEN` is used for the registry login, so no registry
+password secret is required.
+
+## Verify job
+
+Before any image is built:
+
+```text
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm exec biome format .
+pnpm exec biome lint .
+```
+
+Typecheck and format are blocking. Lint is currently informational
+(`continue-on-error`) because the vendored shadcn components and a few legacy
+files carry known findings.
+
+## Repository variables and secrets
+
+`next build` evaluates route handlers, and `@alpin/env` validates the
+environment when those modules are imported. The workflow therefore passes
+build-only values for every variable that is not defined, so a missing secret
+never breaks the build.
+
+`NEXT_PUBLIC_APP_URL` is the exception: it is inlined into the client bundle at
+build time, so it has to be a real value.
+
+Settings → Secrets and variables → Actions → Variables:
+
+```text
+NEXT_PUBLIC_APP_URL=https://app.example.com
+```
+
+The remaining values can be added as repository secrets if the build needs them:
+
+```text
+BETTER_AUTH_SECRET
+BETTER_AUTH_URL
+RESEND_API_KEY
+RESEND_FROM_EMAIL
+STORAGE_BUCKET
+STORAGE_REGION
+STORAGE_ACCESS_KEY_ID
+STORAGE_SECRET_ACCESS_KEY
+STORAGE_ENDPOINT
+STORAGE_PUBLIC_URL
+```
+
+Secrets are never baked into the image. They are passed to the containers at
+runtime through `env_file`.
+
+## Package visibility
+
+GHCR packages are private by default. To pull the images from a deployment
+host, either log in:
+
+```bash
+echo "$GHCR_TOKEN" | docker login ghcr.io -u uzansadik --password-stdin
+```
+
+or change the package visibility to public in the package settings.
+
+## Deployment
+
+`docker-compose.prod.yml` overrides `migrate`, `qms` and `worker` to use the
+published images instead of building locally:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+The deployment host needs Docker only; no Node.js and no source checkout.
+
+Pin a specific build with `APP_TAG`:
+
+```bash
+APP_TAG=main docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+APP_TAG=main docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+---
+
 # Authentication
 
 Authentication is implemented with Better Auth.
@@ -182,7 +353,7 @@ Included flows:
 * Sign out
 * Organization invitations
 
-The `@upkick/auth` package must not depend on Next.js APIs such as:
+The `@alpin/auth` package must not depend on Next.js APIs such as:
 
 ```text
 next/headers
@@ -193,7 +364,7 @@ redirect()
 Next.js-specific authentication helpers belong in:
 
 ```text
-apps/web/features/auth
+apps/qms/features/auth
 ```
 
 ---
@@ -226,7 +397,7 @@ admin
 member
 ```
 
-Sensitive organization settings such as billing and organization deletion are owner-only.
+Sensitive organization settings such as organization deletion are owner-only.
 
 Application resources should generally belong to an organization rather than directly to a user.
 
@@ -250,7 +421,7 @@ when the resource belongs to a workspace.
 
 # Storage
 
-Storage is exposed through `@upkick/storage`.
+Storage is exposed through `@alpin/storage`.
 
 The web application does not depend directly on AWS SDK or Cloudflare R2.
 
@@ -295,7 +466,7 @@ The server verifies uploaded objects before they are persisted to application re
 
 # Email
 
-Email is exposed through `@upkick/email`.
+Email is exposed through `@alpin/email`.
 
 Current provider:
 
@@ -310,271 +481,6 @@ Included examples:
 * Organization invitation
 
 Application code should use the email package instead of importing Resend directly.
-
----
-
-# Billing
-
-Billing uses the Better Auth Polar plugin.
-
-Polar handles:
-
-* Customers
-* Products
-* Checkouts
-* Subscriptions
-* Customer Portal
-* Benefits
-* Usage meters
-* Credits
-* Orders
-* Webhooks
-
-The starter intentionally avoids implementing a second billing system on top of Polar.
-
-## Customer model
-
-With the default Better Auth Polar integration:
-
-```text
-Better Auth User
-      ↓
-Polar Customer
-```
-
-Polar uses the Better Auth user ID as the customer's external ID.
-
-## Organization subscriptions
-
-An organization purchase is associated using:
-
-```text
-referenceId = organization.id
-```
-
-Example:
-
-```ts
-await authClient.checkout({
-  slug: "pro-monthly",
-  referenceId: organization.id,
-});
-```
-
-This allows the same user to own or belong to multiple organizations with separate subscriptions.
-
-Example:
-
-```text
-Sadık
-│
-├─ Organization A
-│     └─ Pro Monthly
-│
-└─ Organization B
-      └─ Pro Yearly
-```
-
-The Polar customer is still the user, while each subscription is associated with its organization through `referenceId`.
-
----
-
-# Example products
-
-The starter contains example Polar products.
-
-```text
-Pro Monthly
-Pro Yearly
-500 AI Credits
-```
-
-These are examples, not mandatory Upkick business rules.
-
-A developer can replace them with:
-
-* API usage
-* Storage
-* Processing minutes
-* Documents
-* Emails
-* Seats
-* AI usage
-* Credits
-* Any other Polar product or meter
-
----
-
-# Feature access example
-
-Upkick includes an example of restricting a page to an organization with an active subscription.
-
-Conceptually:
-
-```text
-Request premium page
-      ↓
-Get active organization
-      ↓
-Query Polar subscriptions
-      ↓
-referenceId = organization.id
-      ↓
-active subscription?
-      ↓
-yes → allow
-no  → redirect to billing
-```
-
-Feature access must be enforced server-side.
-
-Client-side visibility checks are only for user experience and must not be treated as authorization.
-
----
-
-# Usage and credits example
-
-The starter includes AI credits only as an example of Polar usage-based billing.
-
-Example meter:
-
-```text
-AI Credits
-```
-
-Example event:
-
-```text
-ai_usage
-```
-
-Example:
-
-```ts
-await authClient.usage.ingest({
-  event: "ai_usage",
-  metadata: {
-    credits: 3,
-  },
-});
-```
-
-The Polar usage plugin automatically associates usage with the authenticated Polar customer.
-
-Therefore the default example is customer/user scoped.
-
-Organization-shared usage such as:
-
-```text
-Organization storage: 2 TB
-
-Member A uploads 1 GB
-Member B uploads 500 MB
-Member C uploads 10 GB
-```
-
-requires application-specific organization-level billing logic or a Polar SDK extension.
-
-Upkick intentionally leaves that policy to the application developer.
-
----
-
-# Seats
-
-Polar supports seat-based billing.
-
-Upkick does not implement its own seat engine.
-
-A SaaS may choose to combine:
-
-```text
-Better Auth Organization Membership
-+
-Polar Seat Billing
-```
-
-but they represent different concepts:
-
-```text
-Better Auth Member
-= workspace membership
-
-Polar Seat
-= paid billing entitlement
-```
-
-The application decides how these concepts map to each other.
-
----
-
-# Monthly and yearly subscriptions
-
-Monthly and yearly products represent billing intervals, not necessarily different application plans.
-
-Example:
-
-```text
-Pro Monthly
-Pro Yearly
-```
-
-both represent:
-
-```text
-Pro
-```
-
-but use different billing intervals.
-
-Application access logic should avoid unnecessarily duplicating features based on billing interval.
-
----
-
-# Polar Sandbox
-
-Use:
-
-```env
-POLAR_SERVER=sandbox
-```
-
-for local development.
-
-Sandbox products, access tokens, customers, subscriptions, and webhook secrets are separate from production.
-
-When creating organization-specific purchases, pass the active organization ID as the checkout `referenceId`.
-
----
-
-# Polar webhooks
-
-Webhook handling is provided by the Better Auth Polar plugin.
-
-For the standard Upkick Better Auth route:
-
-```text
-/api/auth/polar/webhooks
-```
-
-Configure the Polar Sandbox webhook endpoint to point to your publicly accessible application URL.
-
-For local testing, a temporary Cloudflare Tunnel can be used:
-
-```bash
-cloudflared tunnel --url http://localhost:3000
-```
-
-Then configure Polar with:
-
-```text
-https://your-tunnel.trycloudflare.com/api/auth/polar/webhooks
-```
-
-Store the webhook signing secret in:
-
-```env
-POLAR_WEBHOOK_SECRET=
-```
 
 ---
 
@@ -598,7 +504,7 @@ Profile images are uploaded through the same verified storage pipeline used by o
 Use the existing shadcn components from:
 
 ```text
-@upkick/ui/components/*
+@alpin/ui/components/*
 ```
 
 Do not recreate Button, Input, Field, or other shared UI components inside the web application.
@@ -680,35 +586,32 @@ Application code should not know unnecessary provider details.
 Examples:
 
 ```text
-apps/web
-→ @upkick/storage
+apps/qms
+→ @alpin/storage
 → S3-compatible provider
 ```
 
 ```text
-apps/web
-→ @upkick/email
+apps/qms
+→ @alpin/email
 → Resend
 ```
 
 ```text
-apps/web
-→ @upkick/auth
-→ Better Auth + Polar
+apps/qms
+→ @alpin/auth
+→ Better Auth
 ```
 
 ## Prefer provider capabilities
 
-Do not rebuild features that Polar, Better Auth, PostgreSQL, R2, or another provider already implements well.
+Do not rebuild features that Better Auth, PostgreSQL, R2, or another provider already implements well.
 
 ## Keep business rules application-specific
 
-Upkick may provide examples such as:
+Alpin may provide examples such as:
 
 ```text
-Pro premium page
-AI credits
-seat billing
 storage limits
 ```
 
@@ -722,9 +625,7 @@ UI visibility is not authorization.
 
 Protect sensitive functionality on the server, including:
 
-* Premium pages
 * Organization settings
-* Billing
 * Organization deletion
 * Member management
 * Upload verification
@@ -733,7 +634,7 @@ Protect sensitive functionality on the server, including:
 
 # Current starter scope
 
-Upkick currently provides a working reference for:
+Alpin currently provides a working reference for:
 
 ```text
 Authentication
@@ -746,10 +647,6 @@ Sessions
 Email
 Storage
 Organization branding
-Billing
-Subscriptions
-Usage examples
-Premium access
 ```
 
 The goal is to provide a clean SaaS foundation while leaving product-specific domain logic to the application built on top of it.

@@ -11,11 +11,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@upkick/ui/components",
-    "utils": "@upkick/ui/lib/utils",
-    "hooks": "@upkick/ui/hooks",
-    "lib": "@upkick/ui/lib",
-    "ui": "@upkick/ui/components"
+    "components": "@alpin/ui/components",
+    "utils": "@alpin/ui/lib/utils",
+    "hooks": "@alpin/ui/hooks",
+    "lib": "@alpin/ui/lib",
+    "ui": "@alpin/ui/components"
   },
   "rtl": false,
   "menuColor": "default",

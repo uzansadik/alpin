@@ -1,8 +1,8 @@
 {
-  "extends": "@upkick/typescript-config/react-library.json",
+  "extends": "@alpin/typescript-config/react-library.json",
   "compilerOptions": {
     "paths": {
-      "@upkick/ui/*": ["./src/*"]
+      "@alpin/ui/*": ["./src/*"]
     }
   },
   "include": ["."],

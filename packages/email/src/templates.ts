@@ -1,4 +1,4 @@
-import { appConfig } from "@upkick/config";
+import { appConfig } from "@alpin/config";
 
 import { sendEmail } from "./send";
 

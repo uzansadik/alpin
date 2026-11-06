@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/worker",
+  "name": "@alpin/worker",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,14 +9,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@upkick/email": "workspace:*",
-    "@upkick/env": "workspace:*",
-    "@upkick/queue": "workspace:*",
-    "@upkick/redis": "workspace:*",
+    "@alpin/email": "workspace:*",
+    "@alpin/env": "workspace:*",
+    "@alpin/queue": "workspace:*",
+    "@alpin/redis": "workspace:*",
     "bullmq": "^6.3.2"
   },
   "devDependencies": {
-    "@upkick/typescript-config": "workspace:*",
+    "@alpin/typescript-config": "workspace:*",
     "tsx": "^4.20.0",
     "typescript": "^5"
   }

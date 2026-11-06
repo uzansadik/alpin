@@ -1,14 +1,12 @@
+import { appConfig } from "@alpin/config";
+import { db } from "@alpin/db";
+import * as schema from "@alpin/db/schema";
+import { env } from "@alpin/env/server";
+import { addJob } from "@alpin/queue";
 import { apiKey } from "@better-auth/api-key";
-import { checkout, polar, portal, usage, webhooks } from "@polar-sh/better-auth";
-import { appConfig } from "@upkick/config";
-import { db } from "@upkick/db";
-import * as schema from "@upkick/db/schema";
-import { env } from "@upkick/env/server";
-import { addJob } from "@upkick/queue";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, organization } from "better-auth/plugins";
-import { polarClient } from "./polar";
 
 export const auth = betterAuth({
   appName: appConfig.name,
@@ -95,53 +93,6 @@ export const auth = betterAuth({
         defaultPrefix: "up_",
       },
     ]),
-
-    polar({
-      client: polarClient,
-
-      createCustomerOnSignUp: true,
-
-      use: [
-        checkout({
-          products: [
-            {
-              productId: env.POLAR_PRO_MONTHLY_PRODUCT_ID,
-              slug: "pro-monthly",
-            },
-
-            ...(env.POLAR_PRO_YEARLY_PRODUCT_ID
-              ? [
-                  {
-                    productId: env.POLAR_PRO_YEARLY_PRODUCT_ID,
-                    slug: "pro-yearly",
-                  },
-                ]
-              : []),
-
-            {
-              productId: env.POLAR_AI_CREDITS_500_PRODUCT_ID,
-              slug: "ai-credits-500",
-            },
-          ],
-
-          successUrl: "/settings/billing?checkout=success&checkout_id={CHECKOUT_ID}",
-
-          authenticatedUsersOnly: true,
-        }),
-
-        portal(),
-
-        usage(),
-
-        webhooks({
-          secret: env.POLAR_WEBHOOK_SECRET,
-
-          onPayload: async (payload) => {
-            console.log("[polar webhook]", payload.type);
-          },
-        }),
-      ],
-    }),
   ],
 });
 export type Session = typeof auth.$Infer.Session;

@@ -1,5 +1,5 @@
-import { db } from "@upkick/db";
-import { auditLog } from "@upkick/db/schema";
+import { db } from "@alpin/db";
+import { auditLog } from "@alpin/db/schema";
 
 import type { WriteAuditLogInput } from "./types";
 

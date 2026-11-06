@@ -18,8 +18,8 @@ export type AppConfig = {
 };
 
 export const appConfig = {
-  name: "Upkick",
-  slug: "upkick",
+  name: "Alpin Kimya",
+  slug: "alpin",
 
   description:
     "A modern SaaS application starter kit. Built with Next.js, TypeScript, Tailwind CSS, and shadcn/ui.",

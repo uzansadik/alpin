@@ -3,9 +3,9 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-@source "../../../apps/**/*.{ts,tsx}";
-@source "../../../components/**/*.{ts,tsx}";
-@source "../**/*.{ts,tsx}";
+@source "../../../../apps/**/*.{ts,tsx}";
+@source "../../../../apps/qms/components/**/*.{ts,tsx}";
+@source "../**/*.{ts,tsx}"; /* packages/ui/src/** kapsıyor */
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -48,6 +48,12 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --font-sans: var(--font-sans);
+}
+
+@theme {
+  --color-brand: #05164e;
+  --color-brand-accent: #ffba00;
+  --color-brand-muted: #f1f4fc;
 }
 
 :root {

@@ -1,5 +1,5 @@
 {
-  "name": "@upkick/config",
+  "name": "@alpin/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@upkick/typescript-config": "workspace:*",
+    "@alpin/typescript-config": "workspace:*",
     "typescript": "^5"
   },
   "license": "MIT"
