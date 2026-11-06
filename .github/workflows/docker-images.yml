@@ -141,8 +141,8 @@ jobs:
             STORAGE_REGION=${{ vars.STORAGE_REGION || 'auto' }}
             STORAGE_ACCESS_KEY_ID=${{ secrets.STORAGE_ACCESS_KEY_ID || 'build' }}
             STORAGE_SECRET_ACCESS_KEY=${{ secrets.STORAGE_SECRET_ACCESS_KEY || 'build' }}
-            STORAGE_ENDPOINT=${{ vars.STORAGE_ENDPOINT || '' }}
-            STORAGE_PUBLIC_URL=${{ vars.STORAGE_PUBLIC_URL || '' }}
+            STORAGE_ENDPOINT=${{ vars.STORAGE_ENDPOINT || 'http://localhost:3000' }}
+            STORAGE_PUBLIC_URL=${{ vars.STORAGE_PUBLIC_URL || 'http://localhost:3000' }}
           cache-from: type=gha,scope=qms
           cache-to: type=gha,scope=qms,mode=max
 
