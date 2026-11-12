@@ -1,3 +1,4 @@
+import { env } from "@alpin/env/server";
 import { getTranslations } from "@alpin/i18n/server";
 import { Badge } from "@alpin/ui/components/badge";
 import {
@@ -7,20 +8,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@alpin/ui/components/card";
-import { Building2, CalendarDays, ShieldCheck, Users } from "lucide-react";
+import { Building2, KeyRound, ShieldCheck, Users } from "lucide-react";
 
 import { requireSession } from "@/features/auth/session";
-import { getOrganizationDetails, requireOrganization } from "@/features/organization/server";
+import { getAuthorizationContext } from "@/features/authorization/server";
 
 export default async function DashboardPage() {
   const t = await getTranslations();
 
   const session = await requireSession();
-  const organization = await requireOrganization();
-
-  const details = await getOrganizationDetails(organization.id);
-
-  const currentMember = details?.members.find((member) => member.userId === session.user.id);
+  const context = await getAuthorizationContext();
 
   return (
     <div className="space-y-8">
@@ -32,73 +29,65 @@ export default async function DashboardPage() {
           })}
         </h1>
 
-        <p className="mt-1 text-muted-foreground">
-          Here&apos;s an overview of {organization.name}.
-        </p>
+        <p className="mt-1 text-muted-foreground">{t("dashboard.accessDescription")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("dashboard.members")}</CardTitle>
-
-            <Users className="size-4 text-muted-foreground" />
-          </CardHeader>
-
-          <CardContent>
-            <div className="text-2xl font-semibold">{details?.members.length ?? 0}</div>
-
-            <p className="text-xs text-muted-foreground">Workspace members</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Your role</CardTitle>
-
-            <ShieldCheck className="size-4 text-muted-foreground" />
-          </CardHeader>
-
-          <CardContent>
-            <div className="text-2xl font-semibold capitalize">
-              {currentMember?.role ?? "Member"}
-            </div>
-
-            <p className="text-xs text-muted-foreground">Organization access level</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Workspace</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("dashboard.organization")}</CardTitle>
 
             <Building2 className="size-4 text-muted-foreground" />
           </CardHeader>
 
           <CardContent>
-            <div className="truncate text-2xl font-semibold">{organization.slug}</div>
+            <div className="truncate text-2xl font-semibold">
+              {context.organizationId ?? t("dashboard.none")}
+            </div>
 
-            <p className="text-xs text-muted-foreground">Workspace identifier</p>
+            <p className="text-xs text-muted-foreground">{t("dashboard.organizationHint")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Created</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("dashboard.platformRole")}</CardTitle>
 
-            <CalendarDays className="size-4 text-muted-foreground" />
+            <ShieldCheck className="size-4 text-muted-foreground" />
           </CardHeader>
 
           <CardContent>
-            <div className="text-2xl font-semibold">
-              {organization.createdAt.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </div>
+            <div className="text-2xl font-semibold capitalize">{context.platformRole}</div>
 
-            <p className="text-xs text-muted-foreground">Workspace creation date</p>
+            <p className="text-xs text-muted-foreground">{t("auth.managedByMqdms")}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t("dashboard.roles")}</CardTitle>
+
+            <Users className="size-4 text-muted-foreground" />
+          </CardHeader>
+
+          <CardContent>
+            <div className="text-2xl font-semibold">{context.roles.length}</div>
+
+            <p className="text-xs text-muted-foreground">{t("dashboard.roles")}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t("dashboard.permissions")}</CardTitle>
+
+            <KeyRound className="size-4 text-muted-foreground" />
+          </CardHeader>
+
+          <CardContent>
+            <div className="text-2xl font-semibold">{context.permissions.length}</div>
+
+            <p className="text-xs text-muted-foreground">{t("dashboard.permissions")}</p>
           </CardContent>
         </Card>
       </div>
@@ -106,74 +95,67 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Getting started</CardTitle>
+            <CardTitle>{t("dashboard.access")}</CardTitle>
 
-            <CardDescription>Set up your workspace before you start building.</CardDescription>
+            <CardDescription>{t("dashboard.accessDescription")}</CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            <GettingStartedItem
-              description="Configure your workspace details and preferences."
-              label="Workspace configured"
-            />
+          <CardContent className="space-y-6">
+            <div>
+              <p className="text-sm text-muted-foreground">{t("dashboard.roles")}</p>
 
-            <GettingStartedItem
-              description="Add people who will work with you."
-              label="Invite team members"
-            />
+              <div className="mt-2 flex flex-wrap gap-2">
+                {context.roles.length === 0 ? (
+                  <p className="text-sm">{t("dashboard.none")}</p>
+                ) : (
+                  context.roles.map((role) => (
+                    <Badge className="capitalize" key={role} variant="secondary">
+                      {role}
+                    </Badge>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm text-muted-foreground">{t("dashboard.permissions")}</p>
+
+              <div className="mt-2 flex flex-wrap gap-2">
+                {context.permissions.length === 0 ? (
+                  <p className="text-sm">{t("dashboard.none")}</p>
+                ) : (
+                  context.permissions.map((permission) => (
+                    <Badge key={permission} variant="outline">
+                      {permission}
+                    </Badge>
+                  ))
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Workspace</CardTitle>
+            <CardTitle>{t("auth.managedByMqdms")}</CardTitle>
 
-            <CardDescription>Current organization</CardDescription>
+            <CardDescription>mqdms</CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Name</p>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">{t("auth.managedByMqdms")}</p>
 
-              <p className="font-medium">{organization.name}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground">Slug</p>
-
-              <p className="font-medium">{organization.slug}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground">Your role</p>
-
-              <Badge className="mt-1 capitalize" variant="secondary">
-                {currentMember?.role ?? "member"}
-              </Badge>
-            </div>
+            <a
+              className="mt-4 inline-block text-sm font-medium underline underline-offset-4"
+              href={env.MQDMS_ISSUER}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {new URL(env.MQDMS_ISSUER).host}
+            </a>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-}
-
-type GettingStartedItemProps = {
-  label: string;
-  description: string;
-  pending?: boolean;
-};
-
-function GettingStartedItem({ label, description, pending = false }: GettingStartedItemProps) {
-  return (
-    <div className="flex items-start justify-between gap-4 rounded-lg border p-4">
-      <div>
-        <p className="font-medium">{label}</p>
-
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-
-      <Badge variant={pending ? "outline" : "secondary"}>{pending ? "Coming soon" : "Ready"}</Badge>
     </div>
   );
 }

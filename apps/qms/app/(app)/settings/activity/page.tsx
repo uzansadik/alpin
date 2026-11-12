@@ -1,10 +1,10 @@
 import { getAuditLogs } from "@/features/audit/get-audit-logs";
-import { requireOrganization } from "@/features/organization/server";
+import { requireOrganizationId } from "@/features/authorization/server";
 
 export default async function ActivityPage() {
-  const organization = await requireOrganization();
+  const organizationId = await requireOrganizationId();
 
-  const logs = await getAuditLogs(organization.id);
+  const logs = await getAuditLogs(organizationId);
 
   return (
     <div className="space-y-6">
@@ -31,17 +31,6 @@ export default async function ActivityPage() {
 
 function formatAuditAction(action: string) {
   switch (action) {
-    case "organization.updated":
-      return "updated organization settings";
-
-    case "member.invited":
-      return "invited a member";
-
-    case "member.role_changed":
-      return "changed a member role";
-
-    case "member.removed":
-      return "removed a member";
     case "api_key.created":
       return "created an API key";
 

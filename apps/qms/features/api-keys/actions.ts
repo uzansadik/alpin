@@ -1,15 +1,21 @@
 "use server";
 
 import { audit } from "@/features/audit/server";
+import { getAuthorizationContext } from "@/features/authorization/server";
 
 export async function auditApiKeyCreated(input: {
-  organizationId: string;
   keyId: string;
   name?: string | null;
   prefix?: string | null;
 }) {
+  const context = await getAuthorizationContext();
+
+  if (!context.organizationId) {
+    return;
+  }
+
   await audit({
-    organizationId: input.organizationId,
+    organizationId: context.organizationId,
 
     action: "api_key.created",
 
@@ -25,13 +31,15 @@ export async function auditApiKeyCreated(input: {
   });
 }
 
-export async function auditApiKeyRevoked(input: {
-  organizationId: string;
-  keyId: string;
-  name?: string | null;
-}) {
+export async function auditApiKeyRevoked(input: { keyId: string; name?: string | null }) {
+  const context = await getAuthorizationContext();
+
+  if (!context.organizationId) {
+    return;
+  }
+
   await audit({
-    organizationId: input.organizationId,
+    organizationId: context.organizationId,
 
     action: "api_key.revoked",
 

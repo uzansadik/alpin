@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getSession } from "@/features/auth/session";
-import { requireOrganization } from "@/features/organization/server";
+import { getAuthorizationContext } from "@/features/authorization/server";
 
 const schema = z.object({
   purpose: z.enum(["user-avatar", "organization-logo"]),
@@ -42,9 +42,20 @@ export async function POST(request: Request) {
   if (parsed.data.purpose === "user-avatar") {
     ownerId = session.user.id;
   } else {
-    const organization = await requireOrganization();
+    const context = await getAuthorizationContext();
 
-    ownerId = organization.id;
+    if (!context.organizationId) {
+      return NextResponse.json(
+        {
+          error: "No organization.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    ownerId = context.organizationId;
   }
 
   try {

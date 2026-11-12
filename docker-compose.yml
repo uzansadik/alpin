@@ -18,6 +18,14 @@ x-build-args: &build-args
   STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
   STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL:-}
 
+  # mqdms (OAuth client) bağlantısı. `@alpin/env` build sırasında doğrulandığı
+  # için client id zorunludur. Public client'ta secret boş bırakılır.
+  MQDMS_ISSUER: ${MQDMS_ISSUER:-https://auth.mqdms.com}
+  MQDMS_CLIENT_ID: ${MQDMS_CLIENT_ID:?MQDMS_CLIENT_ID is required}
+  MQDMS_CLIENT_SECRET: ${MQDMS_CLIENT_SECRET:-}
+  MQDMS_REDIRECT_URI: ${MQDMS_REDIRECT_URI:-}
+  MQDMS_RESOURCE: ${MQDMS_RESOURCE:-}
+
 services:
   postgres:
     image: postgres:17
@@ -88,6 +96,13 @@ services:
       QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      # `packages/db` `@alpin/env/server` şemasını doğruladığı için migrate
+      # servisine de mqdms değişkenleri gerekiyor.
+      MQDMS_ISSUER: ${MQDMS_ISSUER:-https://auth.mqdms.com}
+      MQDMS_CLIENT_ID: ${MQDMS_CLIENT_ID:?MQDMS_CLIENT_ID is required}
+      MQDMS_CLIENT_SECRET: ${MQDMS_CLIENT_SECRET:-}
+      MQDMS_REDIRECT_URI: ${MQDMS_REDIRECT_URI:-}
+      MQDMS_RESOURCE: ${MQDMS_RESOURCE:-}
 
     depends_on:
       postgres:
@@ -113,6 +128,11 @@ services:
       QUEUE_PREFIX: ${QUEUE_PREFIX:-alpin}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      MQDMS_ISSUER: ${MQDMS_ISSUER:-https://auth.mqdms.com}
+      MQDMS_CLIENT_ID: ${MQDMS_CLIENT_ID:?MQDMS_CLIENT_ID is required}
+      MQDMS_CLIENT_SECRET: ${MQDMS_CLIENT_SECRET:-}
+      MQDMS_REDIRECT_URI: ${MQDMS_REDIRECT_URI:-}
+      MQDMS_RESOURCE: ${MQDMS_RESOURCE:-}
 
     ports:
       - "${APP_PORT:-3000}:3000"

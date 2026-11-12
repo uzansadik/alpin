@@ -1,15 +1,14 @@
 import { index, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { organization, user } from "./auth";
+import { user } from "./auth";
 
 export const auditLog = pgTable(
   "audit_log",
   {
     id: uuid("id").defaultRandom().primaryKey(),
 
-    organizationId: text("organization_id").references(() => organization.id, {
-      onDelete: "cascade",
-    }),
+    /** mqdms organizasyon id'si (alpin'de organizasyon kaydı tutulmaz). */
+    organizationId: text("organization_id"),
 
     actorId: text("actor_id").references(() => user.id, {
       onDelete: "set null",
