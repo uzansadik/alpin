@@ -156,18 +156,25 @@ if (!hasPermission(ctx, "project:delete")) {
 | Redirect URI | `https://app.o7n.io/api/auth/callback/mqdms` |
 | Resource | `https://app.o7n.io` (client'a bağlı olmalı) |
 | Scope | `openid profile email offline_access permissions:read` |
-| Token endpoint auth | `none` (public client) → secret yok |
+| Token endpoint auth | `client_secret_basic` (confidential client) → secret var |
 
 Kayıt sonrası `client_id` Coolify env'ine `MQDMS_CLIENT_ID` olarak yazılır.
-Secret **yalnızca bir kez** gösterilir; public client kullanılmıyorsa
-`MQDMS_CLIENT_SECRET` ile saklanır.
+Secret **yalnızca bir kez** gösterilir; `MQDMS_CLIENT_SECRET` ile saklanır.
+
+> **Token endpoint auth yöntemi better-auth'e bildirilmelidir.** mqdms client'ı
+> `client_secret_basic` ise secret HTTP Basic başlığında gönderilir;
+> better-auth'in varsayılanı `client_secret_post`'tur ve mqdms bunu
+> "client registered for client_secret_basic cannot use client_secret_post"
+> hatasıyla reddeder. `packages/auth/src/server.ts` → `genericOAuth` →
+> `tokenEndpointAuth: { method: "client_secret_basic" }`.
+> Public client ise `method: "none"` olmalıdır.
 
 ## Env
 
 ```
 MQDMS_ISSUER=https://auth.mqdms.com
 MQDMS_CLIENT_ID=<client_id>
-MQDMS_CLIENT_SECRET=            # public client → boş
+MQDMS_CLIENT_SECRET=<client secret>   # confidential client → dolu
 MQDMS_REDIRECT_URI=https://app.o7n.io/api/auth/callback/mqdms
 MQDMS_RESOURCE=https://app.o7n.io
 ```

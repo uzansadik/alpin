@@ -22,6 +22,11 @@ const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),
+  // CSRF koruması için ek güvenilir origin'ler (virgülle ayrılmış).
+  // Better Auth `BETTER_AUTH_TRUSTED_ORIGINS` env'ini kendi okur; burada
+  // tanımlanması, origin listesinin app'in public URL'ini de içermesini
+  // garanti eder.
+  BETTER_AUTH_TRUSTED_ORIGINS: optionalString,
   RESEND_API_KEY: z.string().min(1),
   RESEND_FROM_EMAIL: z.email().min(1, "RESEND_FROM_EMAIL is required"),
   STORAGE_BUCKET: z.string().min(1),
@@ -50,6 +55,7 @@ const parsedEnv = serverEnvSchema.parse({
   NODE_ENV: process.env.NODE_ENV,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+  BETTER_AUTH_TRUSTED_ORIGINS: process.env.BETTER_AUTH_TRUSTED_ORIGINS,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
   STORAGE_BUCKET: process.env.STORAGE_BUCKET,
