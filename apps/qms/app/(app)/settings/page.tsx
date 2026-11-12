@@ -1,9 +1,8 @@
-import { DeleteOrganization } from "@/features/organization/delete-organization";
-import { OrganizationSettingsForm } from "@/features/organization/organization-settings-form";
-import { requireOrganizationOwner } from "@/features/organization/server";
+import { requireOrganizationId } from "@/features/authorization/server";
+import { MqdmsCard } from "@/features/settings/mqdms-card";
 
 export default async function SettingsPage() {
-  const { organization } = await requireOrganizationOwner();
+  const organizationId = await requireOrganizationId();
 
   return (
     <div className="space-y-8">
@@ -15,15 +14,16 @@ export default async function SettingsPage() {
         </p>
       </div>
 
-      <OrganizationSettingsForm
-        organization={{
-          id: organization.id,
-          name: organization.name,
-          slug: organization.slug,
-          logo: organization.logo ?? undefined,
-        }}
-      />
-      <DeleteOrganization organizationId={organization.id} organizationName={organization.name} />
+      <MqdmsCard
+        description="Organization name, slug, branding and members are managed in mqdms."
+        title="Organization"
+      >
+        <div>
+          <p className="text-sm text-muted-foreground">Organization id</p>
+
+          <p className="font-medium">{organizationId}</p>
+        </div>
+      </MqdmsCard>
     </div>
   );
 }

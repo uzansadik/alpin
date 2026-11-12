@@ -143,6 +143,11 @@ jobs:
             STORAGE_SECRET_ACCESS_KEY=${{ secrets.STORAGE_SECRET_ACCESS_KEY || 'build' }}
             STORAGE_ENDPOINT=${{ vars.STORAGE_ENDPOINT || 'http://localhost:3000' }}
             STORAGE_PUBLIC_URL=${{ vars.STORAGE_PUBLIC_URL || 'http://localhost:3000' }}
+            MQDMS_ISSUER=${{ vars.MQDMS_ISSUER || 'https://auth.mqdms.com' }}
+            MQDMS_CLIENT_ID=${{ vars.MQDMS_CLIENT_ID || 'ci-build-placeholder-client-id' }}
+            MQDMS_CLIENT_SECRET=${{ secrets.MQDMS_CLIENT_SECRET || '' }}
+            MQDMS_REDIRECT_URI=${{ vars.MQDMS_REDIRECT_URI || '' }}
+            MQDMS_RESOURCE=${{ vars.MQDMS_RESOURCE || '' }}
           cache-from: type=gha,scope=qms
           cache-to: type=gha,scope=qms,mode=max
 

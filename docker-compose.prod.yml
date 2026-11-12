@@ -18,6 +18,16 @@ services:
     pull_policy: always
     build: !reset null
 
+    # Production'da mqdms client kaydı `app.o7n.io` redirect URI'si ile
+    # eşleşmelidir. Boş bırakılan değerler env şemasındaki varsayılana
+    # düşer.
+    environment:
+      MQDMS_ISSUER: ${MQDMS_ISSUER:-https://auth.mqdms.com}
+      MQDMS_CLIENT_ID: ${MQDMS_CLIENT_ID:?MQDMS_CLIENT_ID is required}
+      MQDMS_CLIENT_SECRET: ${MQDMS_CLIENT_SECRET:-}
+      MQDMS_REDIRECT_URI: ${MQDMS_REDIRECT_URI:-}
+      MQDMS_RESOURCE: ${MQDMS_RESOURCE:-}
+
   worker:
     image: ghcr.io/uzansadik/alpin/worker:${APP_TAG:-latest}
     pull_policy: always

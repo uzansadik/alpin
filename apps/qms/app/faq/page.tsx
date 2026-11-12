@@ -10,7 +10,7 @@ const items = [
     value: "item-1",
     trigger: "How do I reset my password?",
     content:
-      "Click on 'Forgot Password' on the login page, enter your email address, and we'll send you a link to reset your password. The link will expire in 24 hours.",
+      "Passwords are managed by mqdms. Open your mqdms account settings, change your password there, then sign in to Alpin again.",
   },
   {
     value: "item-2",

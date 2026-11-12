@@ -6,6 +6,12 @@ import { z } from "zod";
 // `undefined`'a çeviriyoruz.
 const optionalUrl = z.preprocess((value) => (value === "" ? undefined : value), z.url().optional());
 
+// Public client (secret yok) ve boş bırakılabilen metin değişkenleri için.
+const optionalString = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.string().optional(),
+);
+
 const serverEnvSchema = z.object({
   APP_ENV: z.enum(["local", "production", "test"]).default("local"),
   DATABASE_URL: z
@@ -26,9 +32,19 @@ const serverEnvSchema = z.object({
   STORAGE_PUBLIC_URL: optionalUrl,
   NEXT_PUBLIC_APP_URL: z.url().min(1, "NEXT_PUBLIC_APP_URL is required"),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+
+  // mqdms (merkezi OAuth 2.1 / OIDC sağlayıcısı) bağlantısı.
+  MQDMS_ISSUER: z.url().default("https://auth.mqdms.com"),
+  MQDMS_CLIENT_ID: z.string().min(1, "MQDMS_CLIENT_ID is required"),
+  // Public client'ta boş bırakılır.
+  MQDMS_CLIENT_SECRET: optionalString,
+  // Varsayılan: `${NEXT_PUBLIC_APP_URL}/api/auth/callback/mqdms`
+  MQDMS_REDIRECT_URI: optionalUrl,
+  // Varsayılan: `${NEXT_PUBLIC_APP_URL}` (RFC 8707 `resource` değeri)
+  MQDMS_RESOURCE: optionalUrl,
 });
 
-export const env = serverEnvSchema.parse({
+const parsedEnv = serverEnvSchema.parse({
   APP_ENV: process.env.APP_ENV,
   DATABASE_URL: process.env.DATABASE_URL,
   NODE_ENV: process.env.NODE_ENV,
@@ -44,6 +60,20 @@ export const env = serverEnvSchema.parse({
   STORAGE_PUBLIC_URL: process.env.STORAGE_PUBLIC_URL,
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   REDIS_URL: process.env.REDIS_URL,
+  MQDMS_ISSUER: process.env.MQDMS_ISSUER,
+  MQDMS_CLIENT_ID: process.env.MQDMS_CLIENT_ID,
+  MQDMS_CLIENT_SECRET: process.env.MQDMS_CLIENT_SECRET,
+  MQDMS_REDIRECT_URI: process.env.MQDMS_REDIRECT_URI,
+  MQDMS_RESOURCE: process.env.MQDMS_RESOURCE,
 });
 
-export type ServerEnv = z.infer<typeof serverEnvSchema>;
+export const env = {
+  ...parsedEnv,
+
+  MQDMS_REDIRECT_URI:
+    parsedEnv.MQDMS_REDIRECT_URI ?? `${parsedEnv.NEXT_PUBLIC_APP_URL}/api/auth/callback/mqdms`,
+
+  MQDMS_RESOURCE: parsedEnv.MQDMS_RESOURCE ?? parsedEnv.NEXT_PUBLIC_APP_URL,
+};
+
+export type ServerEnv = typeof env;

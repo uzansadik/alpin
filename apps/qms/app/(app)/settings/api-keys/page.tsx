@@ -1,8 +1,8 @@
 import { ApiKeysSection } from "@/features/api-keys/api-keys-section";
-import { requireOrganizationOwner } from "@/features/organization/server";
+import { requireSession } from "@/features/auth/session";
 
 export default async function ApiKeysPage() {
-  const { organization } = await requireOrganizationOwner();
+  await requireSession();
 
   return (
     <div className="space-y-8">
@@ -10,11 +10,11 @@ export default async function ApiKeysPage() {
         <h1 className="text-2xl font-semibold">API Keys</h1>
 
         <p className="text-sm text-muted-foreground">
-          Create and manage API keys for your organization.
+          Create and manage API keys for your account.
         </p>
       </div>
 
-      <ApiKeysSection organizationId={organization.id} />
+      <ApiKeysSection />
     </div>
   );
 }

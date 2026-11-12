@@ -6,20 +6,28 @@ import { Input } from "@alpin/ui/components/input";
 import { useCallback, useEffect, useState } from "react";
 import { auditApiKeyCreated, auditApiKeyRevoked } from "./actions";
 
-type ApiKeysSectionProps = {
-  organizationId: string;
+/**
+ * API anahtarları kullanıcıya bağlıdır (`references: "user"`); organizasyon
+ * referansı yoktur.
+ */
+const API_KEY_CONFIG_ID = "user-keys";
+
+type ApiKeyItem = {
+  id: string;
+  name?: string | null;
+  prefix?: string | null;
+  start?: string | null;
 };
 
-export function ApiKeysSection({ organizationId }: ApiKeysSectionProps) {
+export function ApiKeysSection() {
   const [name, setName] = useState("");
-  const [keys, setKeys] = useState<any[]>([]);
+  const [keys, setKeys] = useState<ApiKeyItem[]>([]);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
 
   const loadKeys = useCallback(async () => {
     const { data, error } = await authClient.apiKey.list({
       query: {
-        configId: "org-keys",
-        organizationId,
+        configId: API_KEY_CONFIG_ID,
         sortBy: "createdAt",
         sortDirection: "desc",
       },
@@ -28,7 +36,7 @@ export function ApiKeysSection({ organizationId }: ApiKeysSectionProps) {
     if (!error && data) {
       setKeys(data.apiKeys);
     }
-  }, [organizationId]);
+  }, []);
 
   useEffect(() => {
     void loadKeys();
@@ -36,11 +44,9 @@ export function ApiKeysSection({ organizationId }: ApiKeysSectionProps) {
 
   async function createKey() {
     const { data, error } = await authClient.apiKey.create({
-      configId: "org-keys",
+      configId: API_KEY_CONFIG_ID,
 
-      organizationId,
-
-      name: name.trim() || "Organization API Key",
+      name: name.trim() || "Personal API Key",
     });
 
     if (error || !data) {
@@ -54,9 +60,8 @@ export function ApiKeysSection({ organizationId }: ApiKeysSectionProps) {
     setCreatedKey(data.key);
     setName("");
     await auditApiKeyCreated({
-      organizationId,
       keyId: data.id,
-      name: name.trim() || "Organization API Key",
+      name: name.trim() || "Personal API Key",
       prefix: data.prefix,
     });
 
@@ -65,12 +70,11 @@ export function ApiKeysSection({ organizationId }: ApiKeysSectionProps) {
 
   async function deleteKey(keyId: string) {
     const { error } = await authClient.apiKey.delete({
-      configId: "org-keys",
+      configId: API_KEY_CONFIG_ID,
       keyId,
     });
 
     await auditApiKeyRevoked({
-      organizationId,
       keyId,
     });
 

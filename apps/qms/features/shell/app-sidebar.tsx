@@ -13,19 +13,15 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@alpin/ui/components/sidebar";
-import { LayoutDashboard, Settings } from "lucide-react";
+import { Building2, LayoutDashboard, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { UserMenu } from "@/features/auth/user-menu";
-import { OrganizationSwitcher } from "@/features/organization/organization-switcher";
 
 type AppSidebarProps = {
-  organization: {
-    id: string;
-    name: string;
-    slug: string;
-  };
+  organizationId: string;
+  mqdmsUrl: string;
   user: {
     name: string;
     email: string;
@@ -45,13 +41,27 @@ const navigation = [
   },
 ];
 
-export function AppSidebar({ organization, user }: AppSidebarProps) {
+export function AppSidebar({ organizationId, mqdmsUrl, user }: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <OrganizationSwitcher organization={organization} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild size="lg">
+              <a href={mqdmsUrl} rel="noreferrer" target="_blank">
+                <Building2 />
+
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Workspace</span>
+
+                  <span className="truncate text-xs text-muted-foreground">{organizationId}</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>

@@ -19,6 +19,13 @@ x-runtime-env: &runtime-env
   STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:?STORAGE_SECRET_ACCESS_KEY is required}
   STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
   STORAGE_PUBLIC_URL: ${STORAGE_PUBLIC_URL:-}
+  # mqdms OAuth client ayarları. Coolify env'ine yazılır; client id mqdms
+  # admin panelinden alınır. Public client'ta secret boş bırakılır.
+  MQDMS_ISSUER: ${MQDMS_ISSUER:-https://auth.mqdms.com}
+  MQDMS_CLIENT_ID: ${MQDMS_CLIENT_ID:?MQDMS_CLIENT_ID is required}
+  MQDMS_CLIENT_SECRET: ${MQDMS_CLIENT_SECRET:-}
+  MQDMS_REDIRECT_URI: ${MQDMS_REDIRECT_URI:-}
+  MQDMS_RESOURCE: ${MQDMS_RESOURCE:-}
 
 services:
   postgres:

@@ -7,11 +7,18 @@ export const en = {
 
   "navigation.dashboard": "Dashboard",
   "navigation.settings": "Settings",
-  "navigation.organization": "Organization",
 
   "dashboard.title": "Dashboard",
   "dashboard.welcome": "Welcome back, {name}",
-  "dashboard.members": "Members",
+  "dashboard.organization": "Organization",
+  "dashboard.organizationHint": "Organization id from mqdms",
+  "dashboard.platformRole": "Platform role",
+  "dashboard.roles": "Roles",
+  "dashboard.permissions": "Permissions",
+  "dashboard.access": "Your access",
+  "dashboard.accessDescription":
+    "Roles and permissions are published by mqdms and refreshed on every sign-in.",
+  "dashboard.none": "None",
 
   "settings.title": "Settings",
   "settings.language": "Language",
@@ -21,28 +28,25 @@ export const en = {
 
   "auth.login": "Log in",
   "auth.logout": "Log out",
-  "auth.register": "Create account",
 
   "auth.login.title": "Sign in",
-  "auth.login.description": "Enter your credentials to continue.",
-  "auth.login.email": "Email",
-  "auth.login.password": "Password",
-  "auth.login.forgotPassword": "Forgot password?",
-  "auth.login.submit": "Sign in",
+  "auth.login.description": "Continue with your mqdms account.",
   "auth.login.submitting": "Signing in...",
-  "auth.login.error": "Unable to sign in. Please try again.",
-  "auth.login.noAccount": "Don't have an account? Ask your administrator.",
+  "auth.login.continueWithMqdms": "Continue with mqdms",
+  "auth.login.mqdmsHint": "Your account, organization and permissions are managed by mqdms.",
 
   "auth.layout.headline": "Build and manage your work in one place.",
   "auth.layout.description":
     "A modern SaaS application starter kit. Built with Next.js, TypeScript, Tailwind CSS, and shadcn/ui.",
   "auth.layout.copyright": "© {year} {name}",
 
-  "auth.register.title": "Registration closed",
-  "auth.register.warningTitle": "Registration is not allowed by the system",
-  "auth.register.warningDescription":
-    "User accounts are opened by the organization administrator, registration forms are closed. If you don't have an account, contact your administrator.",
-  "auth.register.backToLogin": "Back to sign in",
+  "auth.managedByMqdms": "Managed by mqdms",
+
+  "auth.noWorkspace.title": "No organization yet",
+  "auth.noWorkspace.description":
+    "Your mqdms account is not linked to an organization. Join or create one in mqdms, then sign in again.",
+  "auth.noWorkspace.manage": "Manage in mqdms",
+  "auth.noWorkspace.signOut": "Sign out",
 } as const;
 
 export type MessageKey = keyof typeof en;
