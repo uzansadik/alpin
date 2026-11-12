@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1787835687043,
-      "tag": "0000_illegal_korg",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1794441690295,
-      "tag": "0001_colorful_bloodstorm",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1794441696561,
-      "tag": "0002_huge_drax",
+      "when": 1794463361535,
+      "tag": "0000_empty_anthem",
       "breakpoints": true
     }
   ]
