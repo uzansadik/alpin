@@ -104,11 +104,54 @@ function isMqdmsCallback(context: { path?: string } | null): boolean {
   return context?.path?.startsWith("/callback/") ?? false;
 }
 
+/**
+ * CSRF koruması için güvenilir origin listesi.
+ *
+ * Better Auth `Origin` başlığını `trustedOrigins` ile karşılaştırır; liste
+ * varsayılan olarak yalnızca `baseURL` (yani `BETTER_AUTH_URL`) origin'ini
+ * içerir. Prod'da `BETTER_AUTH_URL` yanlış tanımlanırsa (örn. mqdms issuer'ı
+ * yazılırsa) tarayıcı origin'i listede bulunamaz ve giriş akışı
+ * `INVALID_ORIGIN` hatasıyla kırılır.
+ *
+ * Bu yüzden app'in public URL'i (`NEXT_PUBLIC_APP_URL`) de listeye eklenir.
+ * Fonksiyon biçimi seçilir: Better Auth kendi origin'lerini (baseURL ve
+ * `BETTER_AUTH_TRUSTED_ORIGINS` env'i) listeden düşürmez, üstüne ekler.
+ */
+function getTrustedOrigins(): string[] {
+  const origins = new Set<string>();
+
+  const add = (value: string | undefined) => {
+    const trimmed = value?.trim();
+    if (!trimmed) return;
+
+    try {
+      origins.add(new URL(trimmed).origin);
+    } catch {
+      // Geçersiz origin yok sayılır.
+    }
+  };
+
+  add(env.NEXT_PUBLIC_APP_URL);
+
+  for (const value of env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") ?? []) {
+    add(value);
+  }
+
+  return [...origins];
+}
+
 export const auth = betterAuth({
   appName: appConfig.name,
 
   baseURL: env.BETTER_AUTH_URL,
   secret: env.BETTER_AUTH_SECRET,
+
+  /**
+   * Fonksiyon biçimi: Better Auth'in kendi origin'leri (baseURL ve
+   * `BETTER_AUTH_TRUSTED_ORIGINS` env'i) listede kalır, üstüne app'in public
+   * URL'i eklenir.
+   */
+  trustedOrigins: getTrustedOrigins,
 
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -171,6 +214,21 @@ export const auth = betterAuth({
           clientId: env.MQDMS_CLIENT_ID,
           // Public client'ta secret yoktur.
           clientSecret: env.MQDMS_CLIENT_SECRET,
+          /**
+           * Token endpoint kimlik doğrulama yöntemi.
+           *
+           * Secret'li (confidential) mqdms client'ı `client_secret_basic`
+           * olarak kayıtlıdır: secret HTTP Basic başlığında gönderilmelidir.
+           * better-auth'in varsayılanı `client_secret_post`'tur (secret gövdeye
+           * eklenir) ve mqdms bunu "client registered for client_secret_basic
+           * cannot use client_secret_post" hatasıyla reddeder.
+           *
+           * Secret yoksa public client olur ve yöntem `none` olmalıdır
+           * (secret ile `none` kombinasyonu better-auth tarafında reddedilir).
+           */
+          tokenEndpointAuth: env.MQDMS_CLIENT_SECRET
+            ? { method: "client_secret_basic" }
+            : { method: "none" },
           discoveryUrl: `${env.MQDMS_ISSUER}/.well-known/oauth-authorization-server`,
           scopes: ["openid", "profile", "email", "offline_access", "permissions:read"],
           pkce: true,
